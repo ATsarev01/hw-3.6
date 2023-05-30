@@ -11,7 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.hogwarts.schoolfinal.controller.FacultyController;
 import ru.hogwarts.schoolfinal.entity.Faculty;
 import ru.hogwarts.schoolfinal.repository.FacultyRepository;
@@ -19,11 +21,11 @@ import ru.hogwarts.schoolfinal.repository.StudentRepository;
 import ru.hogwarts.schoolfinal.service.FacultyService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
 @WebMvcTest(controllers = FacultyController.class)
 public class FacultyControllerTest {
 
@@ -66,5 +68,49 @@ public class FacultyControllerTest {
                     .isEqualTo(faculty);
             assertThat(facultyRecordResult.getId()).isEqualTo(faculty.getId());
         });
+
     }
+    @Test
+    public void add() throws Exception {
+        Faculty faculty = new Faculty();
+        faculty.setName("Test Faculty");
+        faculty.setColor("Red");
+
+        ResultActions resultActions =  mockMvc.perform(MockMvcRequestBuilders.post("/faculty")
+                .content("{\"name\": \"Test Faculty\", \"color\": \"Red\"}")
+                .contentType(MediaType.APPLICATION_JSON));
+        resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+    }
+    @Test
+    public void update() throws Exception {
+        Optional<Faculty> optionalFaculty = facultyService.getById(1L);
+        long id = optionalFaculty.get().getId();
+        Faculty faculty = new Faculty();
+        faculty.setName("Test Faculty");
+        faculty.setColor("Red");
+
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/faculty/" + id)
+                .content("{\"name\": \"Test Faculty\", \"color\": \"Red\"}")
+                .contentType(MediaType.APPLICATION_JSON));
+        resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void getAllByNameOrColor() throws Exception {
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/faculty")
+                .param("nameOrColor", "Test")
+                .contentType(MediaType.APPLICATION_JSON));
+        resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void getStudentByFacultyId() throws Exception {
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/faculty/1/students")
+                .contentType(MediaType.APPLICATION_JSON));
+        resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+
+
+
 }
