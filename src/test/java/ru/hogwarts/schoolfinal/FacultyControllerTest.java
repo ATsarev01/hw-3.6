@@ -82,17 +82,29 @@ public class FacultyControllerTest {
         resultActions.andExpect(MockMvcResultMatchers.status().isOk());
     }
     @Test
-    public void update() throws Exception {
-        Optional<Faculty> optionalFaculty = facultyService.getById(1L);
-        long id = optionalFaculty.get().getId();
+    public void updateTest() throws Exception {
         Faculty faculty = new Faculty();
-        faculty.setName("Test Faculty");
-        faculty.setColor("Red");
+        faculty.setId(1L);
+        faculty.setColor("Желтый");
+        faculty.setName("Хаффлпафф");
 
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/faculty/" + id)
-                .content("{\"name\": \"Test Faculty\", \"color\": \"Red\"}")
-                .contentType(MediaType.APPLICATION_JSON));
-        resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+        when(facultyRepository.findById(any())).thenReturn(Optional.of(faculty));
+        when(facultyRepository.save(any())).thenReturn(faculty);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/faculty/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(faculty))
+        ).andExpect(result -> {
+            MockHttpServletResponse mockHttpServletResponse = result.getResponse();
+            Faculty facultyRecordResult = objectMapper.readValue(
+                    mockHttpServletResponse.getContentAsString(StandardCharsets.UTF_8),
+                    Faculty.class
+            );
+            assertThat(mockHttpServletResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+            assertThat(facultyRecordResult).usingRecursiveComparison()
+                    .isEqualTo(faculty);
+        });
     }
 
     @Test
