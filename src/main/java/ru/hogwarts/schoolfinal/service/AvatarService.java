@@ -41,8 +41,8 @@ public class AvatarService {
             String fileName = String.format(
                     "%d.%s",
                     student.getId(),
-                    multipartFile.getOriginalFilename()
-            );
+                    StringUtils.getFilenameExtension(multipartFile.getOriginalFilename())
+                    );
             byte[] data = multipartFile.getBytes();
             Path path = Paths.get(avatarDir, fileName);
             Files.write(path, data);

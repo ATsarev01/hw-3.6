@@ -12,7 +12,7 @@ import ru.hogwarts.schoolfinal.repository.StudentRepository;
 import ru.hogwarts.schoolfinal.service.AvatarService;
 
 @RestController
-@RequestMapping("/avatars")
+@RequestMapping("/avatar")
 public class AvatarController {
 
     private final AvatarService avatarService;

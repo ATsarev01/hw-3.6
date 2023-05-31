@@ -29,8 +29,8 @@ public class StudentController {
         return studentService.add(student);
     }
 
-    @PutMapping
-    public Optional<Student> update(@RequestBody long id, @RequestBody Student student) {
+    @PutMapping("{id}")
+    public Optional<Student> update(@PathVariable long id, @RequestBody Student student) {
         return studentService.update(id, student);
     }
 
